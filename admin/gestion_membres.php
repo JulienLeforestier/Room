@@ -5,7 +5,7 @@ require_once('../inc/init.php');
 $title = 'Gestion des membres';
 
 if (!isAdmin()) {
-    header('location:' . URL . 'connexion.php');
+    header('location:' . URL . 'compte.php');
     exit();
 }
 
@@ -42,6 +42,7 @@ $resultats = execRequete('SELECT * FROM membre ORDER BY nom,prenom');
         }
         ?>
         <th>Rôle</th>
+        
     </tr>
     <?php
     // données de colonne

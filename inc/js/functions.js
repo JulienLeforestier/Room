@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let confirmations = document.querySelectorAll('.confirm');
     for (let i = 0; i < confirmations.length; i++) {
         confirmations[i].onclick = function () {
-            return (confirm('Êtes-vous sûr(e) de vouloir supprimer ce produit ?'))
+            return (confirm('Êtes-vous sûr(e) de vouloir appliquer cette suppression ?'))
         }
     }
 

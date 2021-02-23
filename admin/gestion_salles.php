@@ -5,7 +5,7 @@ require_once('../inc/init.php');
 $title = 'Gestion des salles';
 
 if (!isAdmin()) {
-    header('location:' . URL . 'connexion.php');
+    header('location:' . URL . 'compte.php');
     exit();
 }
 
@@ -29,8 +29,6 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete' && !empty($_GET['id_sa
 
 // traitement du formulaire
 if (!empty($_POST)) {
-    // var_dump($_POST);
-    // var_dump($_FILES);
     // contrôles
     $nb_champs_vides = 0;
     foreach ($_POST as $key => $value) {
@@ -56,9 +54,9 @@ if (!empty($_POST)) {
                 unlink($_SERVER['DOCUMENT_ROOT'] . URL . 'photos/' . $_POST['photo_actuelle']);
             }
             // gérer la photo (copie physique du fichier)
-            $nomPhotoBDD = $_POST['reference'] . '_' . $_FILES['photo']['name'];
+            $nomPhotoBDD = $_POST['titre'] . '_' . $_FILES['photo']['name'];
             $dossierPhotos = $_SERVER['DOCUMENT_ROOT'] . URL . 'photos/';
-            // déplacement du fichier temporaire vers le dossier 'photos' sous un nom unique (composé de la référence et du nom original du fichier)
+            // déplacement du fichier temporaire vers le dossier 'photos' sous un nom unique (composé du titre et du nom original du fichier)
             move_uploaded_file($_FILES['photo']['tmp_name'], $dossierPhotos . $nomPhotoBDD);
         } else {
             $nomPhotoBDD = $_POST['photo_actuelle'];
@@ -70,12 +68,12 @@ if (!empty($_POST)) {
         if (isset($_POST['id_salle'])) {
             // update en BDD
             execRequete("UPDATE salle SET 
-            reference=:reference,categorie=:categorie,titre=:titre,description=:description,couleur=:couleur,taille=:taille,public=:public,photo=:photo,prix=:prix,stock=:stock 
+            titre=:titre,description=:description,photo=:photo,pays=:pays,ville=:ville,adresse=:adresse,cp=:cp,capacite=:capacite,categorie=:categorie
             WHERE id_salle=:id_salle", $_POST);
         } else {
             // insert en BDD
             execRequete("INSERT INTO salle VALUES 
-            (NULL,:reference,:categorie,:titre,:description,:couleur,:taille,:public,:photo,:prix,:stock)", $_POST);
+            (NULL,:titre,:description,:photo,:pays,:ville,:adresse,:cp,:capacite,:categorie)", $_POST);
         }
         // on force le mode affichage des salles
         header('location:' . $_SERVER['PHP_SELF']);
@@ -98,47 +96,35 @@ require_once('../inc/header.php');
 
 <?php
 
-if (!isset($_GET['action']) || (isset($_GET['action']) && $_GET['action'] == 'affichage')) {
+if (!isset($_GET['action']) || (isset($_GET['action']) && $_GET['action'] == 'affichage')) :
     // affichage des salles
     $resultats = execRequete('SELECT * FROM salle');
-    if ($resultats->rowCount() == 0) {
-?>
+    if ($resultats->rowCount() == 0) : ?>
         <div class="alert alert-info mt-5">Il n'y a pas encore de salles enregistrées</div>
-    <?php
-    } else {
-    ?>
-        <p class="py-5">Il y a <?php echo $resultats->rowCount() ?> salle(s)</p>
+    <?php else : ?>
+        <p class="py-5">Il y a <?php echo $resultats->rowCount() ?> salle<?php echo ($resultats->rowCount() > 1) ? 's' : '' ?></p>
         <table class="table table-bordered table-striped table-responsive-lg">
             <tr>
-                <?php
-                // entêtes de colonne
-                for ($i = 0; $i < $resultats->columnCount(); $i++) {
+                <!-- entêtes de colonne -->
+                <?php for ($i = 0; $i < $resultats->columnCount(); $i++) :
                     $colonne = $resultats->getColumnMeta($i);
-                    // var_dump(get_class_methods($resultats));
                 ?>
                     <th><?php echo ucfirst($colonne['name']); ?></th>
-                <?php
-                }
-                ?>
+                <?php endfor; ?>
                 <th colspan="2">Actions</th>
             </tr>
-            <?php
-            // données de colonne
-            while ($ligne = $resultats->fetch()) {
-            ?>
+            <!-- données de colonne -->
+            <?php while ($ligne = $resultats->fetch()) : ?>
                 <tr>
                     <?php
                     foreach ($ligne as $key => $value) {
                         switch ($key) {
                             case 'photo':
-                                if (!empty($value)) $value = '<img class="img-fluid" src="' . URL . 'photos/' . $value . '" alt="' . $ligne['titre'] . '"';
+                                if (!empty($value)) $value = '<img class="img-fluid vignette" src="' . URL . 'photos/' . $value . '" alt="' . $ligne['titre'] . '"';
                                 break;
-                            case 'prix':
-                                $value = number_format($value, 2, ',', '&nbsp;') . '&euro;';
-                                break;
-                            case 'public':
-                                $publics = array('m' => 'Homme', 'f' => 'Femme', 'mixte' => 'Mixte');
-                                $value = $publics[$value];
+                            case 'categorie':
+                                $categories = array('reunion' => 'Réunion', 'formation' => 'Formation', 'bureau' => 'Bureau');
+                                $value = $categories[$value];
                                 break;
                             case 'description':
                                 $extrait = (iconv_strlen($value) > 35) ? substr($value, 0, 35) : $value;
@@ -156,22 +142,19 @@ if (!isset($_GET['action']) || (isset($_GET['action']) && $_GET['action'] == 'af
                     <td><a href="?action=edit&id_salle=<?php echo $ligne['id_salle'] ?>"><i class="fas fa-edit"></i></a></td>
                     <td><a href="?action=delete&id_salle=<?php echo $ligne['id_salle'] ?>" class="confirm"><i class="fas fa-trash-alt"></i></a></td>
                 </tr>
-            <?php
-            }
-            ?>
+            <?php endwhile; ?>
         </table>
-    <?php
-    }
-}
+    <?php endif; ?>
+<?php endif;
 
-if (isset($_GET['action']) && ($_GET['action'] == 'ajout' || $_GET['action'] == 'edit')) {
+if (isset($_GET['action']) && ($_GET['action'] == 'ajout' || $_GET['action'] == 'edit')) :
     // cas d'un formulaire d'édition d'une salle existante
     if ($_GET['action'] == 'edit' && !empty($_GET['id_salle']) && is_numeric($_GET['id_salle'])) {
         $resultat = execRequete("SELECT * FROM salle WHERE id_salle=:id_salle", array('id_salle' => $_GET['id_salle']));
         $salle_courante = $resultat->fetch();
     }
     // formulaire d'édition de salle
-    ?>
+?>
     <?php if (!empty($errors)) : ?>
         <div class="alert alert-danger">
             <?php echo implode('<br>', $errors) ?>
@@ -181,98 +164,72 @@ if (isset($_GET['action']) && ($_GET['action'] == 'ajout' || $_GET['action'] == 
         <?php if (!empty($salle_courante['id_salle'])) : ?>
             <input type="hidden" name="id_salle" value="<?php echo $salle_courante['id_salle'] ?>">
         <?php endif; ?>
-        <div class="form-row">
-            <div class="form-group col-md-6">
-                <label for="reference">Référence</label>
-                <input type="text" class="form-control" id="reference" name="reference" value="<?php echo $_POST['reference'] ?? $salle_courante['reference'] ?? '' ?>">
-            </div>
-            <div class="form-group col-md-6">
-                <label for="categorie">Catégorie</label>
-                <input type="text" class="form-control" id="categorie" name="categorie" value="<?php echo $_POST['categorie'] ?? $salle_courante['categorie'] ?? '' ?>">
-            </div>
-        </div>
         <div class="form-group">
             <label for="titre">Titre</label>
             <input type="text" class="form-control" id="titre" name="titre" value="<?php echo $_POST['titre'] ?? $salle_courante['titre'] ?? '' ?>">
         </div>
-        <div class="form-group">
-            <label for="description">Description</label>
-            <textarea class="form-control" id="description" name="description" rows="7"><?php echo $_POST['description'] ?? $salle_courante['description'] ?? '' ?></textarea>
-        </div>
         <div class="form-row">
-            <div class="form-group col-md-4">
-                <label for="couleur">Couleur</label>
-                <input type="text" class="form-control" id="couleur" name="couleur" value="<?php echo $_POST['couleur'] ?? $salle_courante['couleur'] ?? '' ?>">
+            <div class="form-group col-md-6">
+                <label for="capacite">Capacité</label>
+                <input type="number" class="form-control" id="capacite" name="capacite" value="<?php echo $_POST['capacite'] ?? $salle_courante['capacite'] ?? '' ?>">
             </div>
-            <div class="form-group col-md-4">
-                <label for="taille">Taille</label>
-                <select class="form-control" id="taille" name="taille">
+            <div class="form-group col-md-6">
+                <label for="categorie">Catégorie</label>
+                <select class="form-control" id="categorie" name="categorie">
                     <?php
-                    $tailles = array('S', 'M', 'L', 'XL');
-                    foreach ($tailles as $taille) {
+                    $categories = array('reunion' => 'Réunion', 'formation' => 'Formation', 'bureau' => 'Bureau');
+                    foreach ($categories as $key => $categorie) :
                     ?>
-                        <option <?php echo ((isset($_POST['taille']) && $_POST['taille'] == $taille) || (isset($salle_courante['taille']) && $salle_courante['taille'] == $taille)) ? 'selected' : '' ?>>
-                            <?php echo $taille ?>
+                        <option value="<?php echo $key ?>" <?php echo ((isset($_POST['categorie']) && $_POST['categorie'] == $key) || (isset($salle_courante['categorie']) && $salle_courante['categorie'] == $key)) ? 'selected' : '' ?>>
+                            <?php echo $categorie ?>
                         </option>
-                    <?php
-                    }
-                    ?>
-                </select>
-            </div>
-            <div class="form-group col-md-4">
-                <label for="public">Public</label>
-                <select class="form-control" id="public" name="public">
-                    <?php
-                    $publics = array('m' => 'Homme', 'f' => 'Femme', 'mixte' => 'Mixte');
-                    foreach ($publics as $key => $public) {
-                    ?>
-                        <option value="<?php echo $key ?>" <?php echo ((isset($_POST['public']) && $_POST['public'] == $key) || (isset($salle_courante['public']) && $salle_courante['public'] == $key)) ? 'selected' : '' ?>>
-                            <?php echo $public ?>
-                        </option>
-                    <?php
-                    }
-                    ?>
+                    <?php endforeach; ?>
                 </select>
             </div>
         </div>
-        <div class="form-group">
-            <label for="photo"><i class="fas fa-camera-retro iconephoto"></i></label>
-            <input type="file" class="form-control d-none" id="photo" name="photo" accept="image/jpeg,image/png,image/webp">
-            <div id="preview">
-                <?php
-                if (isset($_GET['action']) && $_GET['action'] == 'edit' && !empty($salle_courante['photo'])) {
-                ?>
-                    <img src="<?php echo URL . 'photos/' . $salle_courante['photo'] ?>" alt="<?php echo $salle_courante['titre'] ?>" class="img-fluid vignette" id="placeholder">
-                <?php
-                } else {
-                ?>
-                    <img src="<?php echo URL . 'img/placeholder600.png' ?>" alt="placeholder" class="img-fluid vignette" id="placeholder">
-                <?php
-                }
-                ?>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="photo"><i class="fas fa-camera-retro iconephoto"></i></label>
+                <input type="file" class="form-control d-none" id="photo" name="photo" accept="image/jpeg,image/png,image/webp">
+                <div id="preview">
+                    <?php if (isset($_GET['action']) && $_GET['action'] == 'edit' && !empty($salle_courante['photo'])) : ?>
+                        <img src="<?php echo URL . 'photos/' . $salle_courante['photo'] ?>" alt="<?php echo $salle_courante['titre'] ?>" class="img-fluid vignette" id="placeholder">
+                    <?php else : ?>
+                        <img src="<?php echo URL . 'img/placeholder600.png' ?>" alt="placeholder" class="img-fluid vignette" id="placeholder">
+                    <?php endif; ?>
+                </div>
+                <!-- mémorisation du nom du fichier actuel pour une salle en édition -->
+                <?php if (isset($_GET['action']) && $_GET['action'] == 'edit' && !empty($salle_courante['photo'])) : ?>
+                    <input type="hidden" name="photo_actuelle" value="<?php echo $salle_courante['photo'] ?>">
+                <?php endif; ?>
             </div>
-            <?php
-            // mémorisation du nom du fichier actuel pour une salle en édition
-            if (isset($_GET['action']) && $_GET['action'] == 'edit' && !empty($salle_courante['photo'])) {
-            ?>
-                <input type="hidden" name="photo_actuelle" value="<?php echo $salle_courante['photo'] ?>">
-            <?php
-            }
-            ?>
+            <div class="form-group col-md-6">
+                <label for="description">Description</label>
+                <textarea class="form-control" id="description" name="description" rows="7"><?php echo $_POST['description'] ?? $salle_courante['description'] ?? '' ?></textarea>
+            </div>
         </div>
         <div class="form-row">
             <div class="form-group col-md-6">
-                <label for="prix">Prix</label>
-                <input type="number" class="form-control" id="prix" name="prix" step="0.01" value="<?php echo $_POST['prix'] ?? $salle_courante['prix'] ?? '' ?>">
+                <label for="pays">Pays</label>
+                <input type="text" class="form-control" id="pays" name="pays" value="<?php echo $_POST['pays'] ?? $salle_courante['pays'] ?? '' ?>">
             </div>
             <div class="form-group col-md-6">
-                <label for="stock">Stock</label>
-                <input type="number" class="form-control" id="stock" name="stock" value="<?php echo $_POST['stock'] ?? $salle_courante['stock'] ?? '' ?>">
+                <label for="ville">Ville</label>
+                <input type="text" class="form-control" id="ville" name="ville" value="<?php echo $_POST['ville'] ?? $salle_courante['ville'] ?? '' ?>">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="adresse">Adresse</label>
+                <textarea class="form-control" id="adresse" name="adresse" rows="2"><?php echo $_POST['adresse'] ?? $salle_courante['adresse'] ?? '' ?></textarea>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="cp">Code Postal</label>
+                <input type="number" class="form-control" id="cp" name="cp" value="<?php echo $_POST['cp'] ?? $salle_courante['cp'] ?? '' ?>">
             </div>
         </div>
         <button type="submit" class="btn btn-primary">Enregistrer</button>
     </form>
-<?php
-}
+<?php endif;
 
 require_once('../inc/footer.php');

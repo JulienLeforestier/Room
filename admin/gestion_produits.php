@@ -5,7 +5,7 @@ require_once('../inc/init.php');
 $title = 'Gestion des produits';
 
 if (!isAdmin()) {
-    header('location:' . URL . 'connexion.php');
+    header('location:' . URL . 'compte.php');
     exit();
 }
 

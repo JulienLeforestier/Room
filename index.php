@@ -38,13 +38,9 @@ $produits = execRequete("SELECT * FROM salle $whereclause", $args);
         </div>
     </div>
     <div class="col-md-9">
-        <?php
-        if ($produits->rowCount() == 0) {
-        ?>
+        <?php if ($produits->rowCount() == 0) : ?>
             <div class="alert alert-info mt-5">Pas encore de produits. Revenez bientôt!</div>
-        <?php
-        } else {
-        ?>
+        <?php else : ?>
             <div class="row">
                 <?php while ($produit = $produits->fetch()) : ?>
                     <div class="col-md-4 p-1">
@@ -64,11 +60,13 @@ $produits = execRequete("SELECT * FROM salle $whereclause", $args);
                     </div>
                 <?php endwhile; ?>
             </div>
-        <?php
-        }
-        ?>
+        <?php endif; ?>
     </div>
 </div>
+
+<?php if (isConnected()) : ?><a href="avis.php">Déposer un commentaire et une note</a>
+<?php else : ?><a href="connexion.php">Connectez-vous</a>
+<?php endif; ?>
 
 <?php
 require_once('inc/footer.php');
