@@ -1,0 +1,34 @@
+body {
+    background-color: beige;
+}
+
+html {
+    min-height: 100vh;
+    position: relative;
+    padding: 56px 0;
+}
+
+footer {
+    position: absolute;
+    bottom: 0;
+}
+
+.iconephoto {
+    font-size: 3rem;
+    cursor: pointer;
+}
+
+.vignette {
+    max-width: 30%;
+}
+
+#bandeaucookies {
+    position: fixed;
+    bottom: -70px;
+}
+
+@media screen and (max-width:720px) {
+    .vignette {
+        max-width: 100%;
+    }
+}
