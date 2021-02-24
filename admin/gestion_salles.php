@@ -102,7 +102,7 @@ if (!isset($_GET['action']) || (isset($_GET['action']) && $_GET['action'] == 'af
     if ($resultats->rowCount() == 0) : ?>
         <div class="alert alert-info mt-5">Il n'y a pas encore de salles enregistrées</div>
     <?php else : ?>
-        <p class="py-5">Il y a <?php echo $resultats->rowCount() ?> salle<?php echo ($resultats->rowCount() > 1) ? 's' : '' ?></p>
+        <p class="py-2">Il y a <?php echo $resultats->rowCount() ?> salle<?php echo ($resultats->rowCount() > 1) ? 's' : '' ?></p>
         <table class="table table-bordered table-striped table-responsive-lg">
             <tr>
                 <!-- entêtes de colonne -->
@@ -116,8 +116,7 @@ if (!isset($_GET['action']) || (isset($_GET['action']) && $_GET['action'] == 'af
             <!-- données de colonne -->
             <?php while ($ligne = $resultats->fetch()) : ?>
                 <tr>
-                    <?php
-                    foreach ($ligne as $key => $value) {
+                    <?php foreach ($ligne as $key => $value) :
                         switch ($key) {
                             case 'photo':
                                 if (!empty($value)) $value = '<img class="img-fluid vignette" src="' . URL . 'photos/' . $value . '" alt="' . $ligne['titre'] . '"';
@@ -136,9 +135,7 @@ if (!isset($_GET['action']) || (isset($_GET['action']) && $_GET['action'] == 'af
                         }
                     ?>
                         <td><?php echo $value ?></td>
-                    <?php
-                    }
-                    ?>
+                    <?php endforeach; ?>
                     <td><a href="?action=edit&id_salle=<?php echo $ligne['id_salle'] ?>"><i class="fas fa-edit"></i></a></td>
                     <td><a href="?action=delete&id_salle=<?php echo $ligne['id_salle'] ?>" class="confirm"><i class="fas fa-trash-alt"></i></a></td>
                 </tr>
@@ -160,7 +157,7 @@ if (isset($_GET['action']) && ($_GET['action'] == 'ajout' || $_GET['action'] == 
             <?php echo implode('<br>', $errors) ?>
         </div>
     <?php endif; ?>
-    <form method="post" enctype="multipart/form-data" class="py-5">
+    <form method="post" enctype="multipart/form-data" class="py-2">
         <?php if (!empty($salle_courante['id_salle'])) : ?>
             <input type="hidden" name="id_salle" value="<?php echo $salle_courante['id_salle'] ?>">
         <?php endif; ?>

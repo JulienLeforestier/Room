@@ -34,9 +34,6 @@ if (!empty($_POST)) {
             id_salle=:id_salle,commentaire=:commentaire,note=:note
             WHERE id_avis=:id_avis", $_POST);
         }
-        // on force le mode affichage des avis
-        // header('location:' . $_SERVER['PHP_SELF']);
-        // exit();
     }
 }
 
@@ -58,7 +55,7 @@ $resultats = execRequete('SELECT * FROM avis');
 if ($resultats->rowCount() == 0) : ?>
     <div class="alert alert-info mt-5">Il n'y a pas encore d'avis enregistrés</div>
 <?php else : ?>
-    <p class="py-5">Il y a <?php echo $resultats->rowCount() ?> avis</p>
+    <p>Il y a <?php echo $resultats->rowCount() ?> avis</p>
     <table class="table table-bordered table-striped table-responsive-lg">
         <tr>
             <!-- entêtes de colonne -->
@@ -72,8 +69,7 @@ if ($resultats->rowCount() == 0) : ?>
         <!-- données de colonne -->
         <?php while ($ligne = $resultats->fetch()) : ?>
             <tr>
-                <?php
-                foreach ($ligne as $key => $value) {
+                <?php foreach ($ligne as $key => $value) :
                     switch ($key) {
                         case 'note':
                             $notes = array('1' => '★', '2' => '★★', '3' => '★★★', '4' => '★★★★', '5' => '★★★★★');
@@ -81,18 +77,19 @@ if ($resultats->rowCount() == 0) : ?>
                             break;
                         case 'id_membre':
                             $email = execRequete("SELECT email FROM membre WHERE id_membre=$value")->fetch()['email'];
-                            $value = $value . ' - ' . $email;
+                            $value .= ' - ' . $email;
                             break;
                         case 'id_salle':
                             $titre = execRequete("SELECT titre FROM salle WHERE id_salle=$value")->fetch()['titre'];
-                            $value = $value . ' - ' . $titre;
+                            $value .= ' - ' . $titre;
+                            break;
+                        case 'date_enregistrement':
+                            $value = date('d/m/Y à H:i:s', strtotime($value));
                             break;
                     }
                 ?>
                     <td><?php echo $value ?></td>
-                <?php
-                }
-                ?>
+                <?php endforeach; ?>
                 <td><a href="?action=edit&id_avis=<?php echo $ligne['id_avis'] ?>"><i class="fas fa-edit"></i></a></td>
                 <td><a href="?action=delete&id_avis=<?php echo $ligne['id_avis'] ?>" class="confirm"><i class="fas fa-trash-alt"></i></a></td>
             </tr>
@@ -114,7 +111,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'edit') :
         </div>
     <?php endif; ?>
 
-    <form method="post">
+    <form method="post" class="py-2">
         <?php if (!empty($avis_courant['id_avis'])) : ?>
             <input type="hidden" name="id_avis" value="<?php echo $avis_courant['id_avis'] ?>">
         <?php endif; ?>
@@ -123,7 +120,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'edit') :
                 <label for="id_salle">Salle</label>
                 <select class="form-control" id="id_salle" name="id_salle">
                     <?php while ($salle = $salles->fetch()) : ?>
-                        <option value="<?php echo $salle['id_salle'] ?>" <?php echo ((isset($_POST['id_salle']) && $_POST['id_salle'] == $salle) || (isset($avis_courant['id_salle']) && $avis_courant['id_salle'] == $salle)) ? 'selected' : '' ?>>
+                        <option value="<?php echo $salle['id_salle'] ?>" <?php echo ((isset($_POST['id_salle']) && $_POST['id_salle'] == $salle['id_salle']) || (isset($avis_courant['id_salle']) && $avis_courant['id_salle'] == $salle['id_salle'])) ? 'selected' : '' ?>>
                             <?php echo $salle['titre'] ?>
                         </option>
                     <?php endwhile; ?>

@@ -6,7 +6,8 @@ $title = 'Accueil';
 
 require_once('inc/header.php');
 
-$categories = execRequete("SELECT DISTINCT categorie FROM salle ORDER BY categorie");
+$categories = execRequete(" SELECT DISTINCT categorie FROM salle 
+                            ORDER BY categorie");
 
 $whereclause = '';
 $args = array();
@@ -26,15 +27,23 @@ $produits = execRequete("SELECT * FROM salle $whereclause", $args);
         <p class="lead pt-3">Catégories</p>
         <div class="list-group">
             <a class="list-group-item <?php echo (!isset($_GET['categorie'])) ? 'active' : '' ?>" href="<?php echo URL ?>">Toutes</a>
-            <?php
-            while ($categorie = $categories->fetch()) {
-            ?>
+            <?php while ($categorie = $categories->fetch()) : ?>
                 <a class="list-group-item <?php echo (isset($_GET['categorie']) && $_GET['categorie'] == $categorie['categorie']) ? 'active' : '' ?>" href="?categorie=<?php echo $categorie['categorie'] ?>">
-                    <?php echo $categorie['categorie'] ?>
+                    <?php
+                    switch ($categorie['categorie']) {
+                        case 'reunion':
+                            echo 'Réunion';
+                            break;
+                        case 'formation':
+                            echo 'Formation';
+                            break;
+                        case 'bureau':
+                            echo 'Bureau';
+                            break;
+                    }
+                    ?>
                 </a>
-            <?php
-            }
-            ?>
+            <?php endwhile; ?>
         </div>
     </div>
     <div class="col-md-9">
@@ -63,10 +72,6 @@ $produits = execRequete("SELECT * FROM salle $whereclause", $args);
         <?php endif; ?>
     </div>
 </div>
-
-<?php if (isConnected()) : ?><a href="avis.php">Déposer un commentaire et une note</a>
-<?php else : ?><a href="connexion.php">Connectez-vous</a>
-<?php endif; ?>
 
 <?php
 require_once('inc/footer.php');

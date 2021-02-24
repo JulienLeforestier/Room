@@ -1,21 +1,25 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // contrôle d'existence
+
     if (document.getElementById('photo')) {
         $('#photo').on('change', function (e) {
-            // équivalent JS = 
-            // document.getElementById('photo').addEventListener('change', function (e) {
             let fichier = e.target.files;
-            //console.log(fichier);
             let reader = new FileReader();
             reader.readAsDataURL(fichier[0]);
             reader.onload = function (event) {
-                // document.getElementById('preview').innerHTML = '<img src="' + event.target.result + '" alt="' + fichier[0].name + '" class="img-fluid vignette" id="placeholder">';
-                // $('#placeholder').on('drop', updatePhoto);
-                // OU on ne touche pas au HTML et du coup nous n'avons pas besoin de rappeler la fonction updatePhoto
                 document.getElementById('placeholder').setAttribute('src', event.target.result);
                 document.getElementById('placeholder').setAttribute('alt', fichier[0].name);
             }
         });
+    }
+
+    function updatePhoto(e) {
+        $('#placeholder').css('border', '');
+        // fichier va récupérer un tableau correspondant au fichier déposé
+        let fichier = e.originalEvent.dataTransfer.files;
+        // défini la propriété files de mon input dont l'id est photo (index dans le DOM = 0)
+        $('#photo')[0].files = fichier;
+        // déclenche manuellement l'évènement change
+        $('#photo').trigger('change');
     }
 
     let confirmations = document.querySelectorAll('.confirm');
@@ -23,30 +27,6 @@ document.addEventListener('DOMContentLoaded', function () {
         confirmations[i].onclick = function () {
             return (confirm('Êtes-vous sûr(e) de vouloir appliquer cette suppression ?'))
         }
-    }
-
-    if (document.getElementById('modalConfirm')) {
-        $('#modalConfirm').modal('show');
-    }
-
-    let lignes = document.querySelectorAll('#tabcommandes tr[data-idcmd]');
-    const URL = "http://localhost/workspacevsc/room/";
-    for (let i = 0; i < lignes.length; i++) {
-        //console.log(lignes[i].dataset);
-        lignes[i].style.cursor = 'pointer';
-        lignes[i].addEventListener('click', function () {
-            //redirection JS
-            window.location.href = URL + 'admin/gestion_commandes.php?action=details&id_commande=' + this.dataset.idcmd;
-        });
-    }
-
-    let selectetats = document.querySelectorAll('#tabcommandes tr[data-idcmd] td select');
-
-    for (let i = 0; i < selectetats.length; i++) {
-        selectetats[i].addEventListener('click', function (e) {
-            // ne propage pas l'évènement click sur le parent <tr> de cette cellule
-            e.stopPropagation();
-        })
     }
 
     if ($('#bandeaucookies').length > 0) {
@@ -86,16 +66,81 @@ document.addEventListener('DOMContentLoaded', function () {
         $('#placeholder').on('drop', updatePhoto);
     }
 
-    function updatePhoto(e) {
-        $('#placeholder').css('border', '');
-        // fichier va récupérer un tableau correspondant au fichier déposé
-        let fichier = e.originalEvent.dataTransfer.files;
-        // défini la propriété files de mon input dont l'id est photo (index dans le DOM = 0)
-        $('#photo')[0].files = fichier;
-        // déclenche manuellement l'évènement change
-        $('#photo').trigger('change');
-        // équivalent JS =
-        // let evenement = new Event('change');
-        // document.getElementById('photo').dispatchEvent(evenement); // déclenche l'addEventListener('change') déclaré plus haut
+    if (document.getElementById('tabs')) {
+        $(function () {
+            $('#tabs').tabs({
+                collapsible: true,
+                event: "click"
+            });
+        });
+    }
+
+    if (document.getElementById('date_arrivee')) {
+        // datetimepicker from to
+        var startDateTextBox = $('#date_arrivee');
+        var endDateTextBox = $('#date_depart');
+        $('#date_depart').prop('disabled', true);
+
+        startDateTextBox.datetimepicker({
+            minDate: 0,
+            defaultDate: "+1w",
+            changeMonth: true,
+            numberOfMonths: 2,
+            closeText: 'Fermer',
+            prevText: 'Précédent',
+            nextText: 'Suivant',
+            monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
+            monthNamesShort: ['Janv.', 'Févr.', 'Mars', 'Avril', 'Mai', 'Juin', 'Juil.', 'Août', 'Sept.', 'Oct.', 'Nov.', 'Déc.'],
+            dayNames: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
+            dayNamesShort: ['Dim.', 'Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.'],
+            dayNamesMin: ['D', 'L', 'M', 'M', 'J', 'V', 'S'],
+            weekHeader: 'Sem.',
+            firstDay: 1,
+            onClose: function (dateText, inst) {
+                if (endDateTextBox.val() != '') {
+                    var testStartDate = startDateTextBox.datetimepicker('getDate');
+                    var testEndDate = endDateTextBox.datetimepicker('getDate');
+                    if (testStartDate > testEndDate)
+                        endDateTextBox.datetimepicker('setDate', testStartDate);
+                }
+                else {
+                    endDateTextBox.val(dateText);
+                }
+            },
+            onSelect: function (selectedDateTime) {
+                endDateTextBox.datetimepicker('option', 'minDate', startDateTextBox.datetimepicker('getDate'));
+                $('#date_depart').prop('disabled', false);
+            }
+        });
+        endDateTextBox.datetimepicker({
+            minDate: 0,
+            defaultDate: "+1w",
+            changeMonth: true,
+            numberOfMonths: 2,
+            closeText: 'Fermer',
+            prevText: 'Précédent',
+            nextText: 'Suivant',
+            monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
+            monthNamesShort: ['Janv.', 'Févr.', 'Mars', 'Avril', 'Mai', 'Juin', 'Juil.', 'Août', 'Sept.', 'Oct.', 'Nov.', 'Déc.'],
+            dayNames: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
+            dayNamesShort: ['Dim.', 'Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.'],
+            dayNamesMin: ['D', 'L', 'M', 'M', 'J', 'V', 'S'],
+            weekHeader: 'Sem.',
+            firstDay: 1,
+            onClose: function (dateText, inst) {
+                if (startDateTextBox.val() != '') {
+                    var testStartDate = startDateTextBox.datetimepicker('getDate');
+                    var testEndDate = endDateTextBox.datetimepicker('getDate');
+                    if (testStartDate > testEndDate)
+                        startDateTextBox.datetimepicker('setDate', testEndDate);
+                }
+                else {
+                    startDateTextBox.val(dateText);
+                }
+            },
+            onSelect: function (selectedDateTime) {
+                startDateTextBox.datetimepicker('option', 'maxDate', endDateTextBox.datetimepicker('getDate'));
+            }
+        });
     }
 });

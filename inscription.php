@@ -25,7 +25,7 @@ if (!empty($_POST)) {
     // contrôle du nombre d'erreur, si aucune, je peux procéder à l'inscription
     if (empty($errors)) {
         $_POST['mdp'] = password_hash($_POST['mdp'], PASSWORD_DEFAULT);
-        execRequete("INSERT INTO membre VALUES (NULL,:pseudo,:mdp,:nom,:prenom,:email,:civilite,0,NOW())", $_POST);
+        execRequete("INSERT INTO membre VALUES (NULL,:pseudo,:mdp,:nom,:prenom,:email,:civilite,1,NOW())", $_POST);
         $_SESSION['membre'] = getMembreByPseudo($_POST['pseudo'])->fetch();
         header('location:' . URL . 'compte.php');
         exit(); // stop la suite du script en attendant la redirection
@@ -45,7 +45,7 @@ require_once('inc/header.php');
         <?php echo implode('<br>', $errors) ?>
     </div>
 <?php endif; ?>
-<form method="post" class="pb-4">
+<form method="post" class="py-2">
     <fieldset>
         <legend>Identifiants</legend>
         <div class="form-group">

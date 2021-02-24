@@ -44,58 +44,17 @@ if (!empty($errors)) : ?>
                         <li>Couleur : <?php echo $infos['couleur'] ?></li>
                     </ul>
                     <p class="lead">Prix : <?php echo number_format($infos['prix'], 2, ',', '&nbsp;') ?>&euro;</p>
-                    <?php if ($infos['stock'] > 0) : ?>
-                        <?php if ($infos['stock'] > 5) : ?>
-                            <p class="text-success">En stock</p>
-                        <?php else : ?>
-                            <p class="text-warning">Plus que <?php echo $infos['stock'] ?> exemplaires</p>
-                        <?php endif; ?>
-                        <!-- formulaire d'ajout au panier -->
-                        <form action="panier.php" method="post">
-                            <input type="hidden" name="id_produit" value="<?php echo $infos['id_produit'] ?>">
-                            <div class="form-row">
-                                <div class="form-group col-2">
-                                    <select name="quantite" class="form-control">
-                                        <?php
-                                        for ($i = 1; $i <= $infos['stock'] && $i <= 10; $i++) {
-                                        ?>
-                                            <option><?php echo $i ?></option>
-                                        <?php
-                                        }
-                                        ?>
-                                    </select>
-                                </div>
-                                <div class="form-group col-10">
-                                    <button type="submit" name="ajout_panier" class="btn btn-primary">Ajouter au panier</button>
-                                </div>
-                            </div>
-                        </form>
-                    <?php else : ?>
-                        <p class="alert alert-warning">Produit en cours de réapprovisionnement</p>
-                    <?php endif; ?>
                 </div>
             </div>
         <?php endif; ?>
     </div>
 </div>
 
+
+<?php if (isConnected()) : ?><a href="avis.php">Déposer un commentaire et une note</a>
+<?php else : ?><a href="connexion.php">Connectez-vous</a>
+<?php endif; ?>
+
 <?php
-if (isset($_GET['sp']) && $_GET['sp'] == 'ok') {
-?>
-    <div class="modal fade" id="modalConfirm" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Le produit a été ajouté au panier</h4>
-                </div>
-                <div class="modal-body">
-                    <a class="btn btn-primary" href="<?php echo URL . 'panier.php' ?>">Voir le panier</a>
-                    <a class="btn btn-primary" href="<?php echo URL ?>">Continuer mes achats</a>
-                </div>
-            </div>
-        </div>
-    </div>
-<?php
-}
 
 require_once('inc/footer.php');

@@ -9,28 +9,11 @@ if (!isAdmin()) {
     exit();
 }
 
-if (!empty($_POST)) {
-    execRequete("UPDATE commande SET etat = :newetat WHERE id_commande = :id_commande
-    ", array('newetat' => $_POST["newetat"], 'id_commande' => $_POST["id_commande"]));
-    // conserve les éventuelles valeurs en $_GET() contrairement au PHP_SELF
-    header('location:' . $_SERVER['REQUEST_URI']);
-    // header('location:' . $_SERVER['PHP_SELF']);
+if (isset($_GET['action']) && $_GET['action'] == 'delete' && !empty($_GET['id_commande']) && is_numeric($_GET['id_commande'])) {
+    // delete en BDD
+    execRequete("DELETE FROM commande WHERE id_commande=:id_commande", array('id_commande' => $_GET['id_commande']));
+    header('location:' . $_SERVER['PHP_SELF']);
     exit();
-}
-
-// commandes 
-$commandes = execRequete("  SELECT * FROM commande c
-                            INNER JOIN membre m on m.id_membre = c.id_membre
-                            ORDER BY c.date_enregistrement DESC");
-
-if (isset($_GET["action"]) && $_GET["action"] == 'details' && !empty($_GET["id_commande"])) {
-    $resultats = execRequete("  SELECT *, p.prix AS prixU 
-                                FROM produit p
-                                INNER JOIN commande c ON c.id_produit = p.id_produit
-                                INNER JOIN membre m ON m.id_membre = c.id_membre
-                                WHERE c.id_commande = :id_commande
-                            ", array('id_commande' => $_GET["id_commande"]));
-    $details_commande = $resultats->fetchAll();
 }
 
 require_once('../inc/header.php');
@@ -41,102 +24,58 @@ require_once('../inc/header.php');
 <h1 class="mt-2">Gestion des commandes</h1>
 <hr>
 
-<div class="row">
-    <div class="col-md-7">
-        <table class="table table-bordered table-striped table-hover" id="tabcommandes">
-            <tr>
-                <th>N°</th>
-                <th>Date</th>
-                <th>Montant</th>
-                <th>Client</th>
-                <th>État</th>
-            </tr>
-            <?php
-            while ($commande = $commandes->fetch()) {
-                $datecmd = new DateTime($commande['date_enregistrement']);
-            ?>
-                <tr data-idcmd="<?php echo $commande['id_commande'] ?>">
-                    <td><?php echo $commande['id_commande'] ?></td>
-                    <td><?php echo $datecmd->format('d/m/Y à H:i:s') ?></td>
-                    <td><?php echo number_format($commande['montant'], 2, ',', '&nbsp;') ?>&euro;</td>
-                    <td><?php echo $commande['nom'] . ' ' . $commande['prenom'] ?></td>
-                    <td>
-                        <form method="post">
-                            <div class="form-row">
-                                <div class="form-group col-11">
-                                    <input type="hidden" name="id_commande" value="<?php echo $commande['id_commande'] ?>">
-                                    <select name="newetat" class="form-control form-control-sm">
-                                        <option>en cours de traitement</option>
-                                        <option <?php echo ($commande['etat'] == 'envoyée') ? 'selected' : '' ?>>envoyée</option>
-                                        <option <?php echo ($commande['etat'] == 'livrée') ? 'selected' : '' ?>>livrée</option>
-                                    </select>
-                                </div>
-                                <div class="form-group col-1">
-                                    <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-sync-alt"></i></button>
-                                </div>
-                            </div>
-                        </form>
-                    </td>
-                </tr>
-            <?php
-            }
-            ?>
-        </table>
-    </div>
-    <div class="col-md-5">
-        <?php
-        if (isset($details_commande)) :
-        ?>
-            <div class="h4 pt-2">Détails de la commande n°<?php echo $details_commande[0]['id_commande'] ?></div>
-            <p><?php echo 'État : ' . $details_commande[0]['etat'] ?><br>
-                <?php echo 'Date de la commande : ' . $details_commande[0]['date_enregistrement'] ?></p>
-            <div class="pt-2">
-                <?php echo ($details_commande[0]['civilite'] == 'm') ? 'M' : 'Mme' ?>
-                <?php echo $details_commande[0]['nom'] ?>
-                <?php echo $details_commande[0]['prenom'] ?>
-                <br>
-                <?php echo $details_commande[0]['adresse'] ?>
-                <br>
-                <?php echo $details_commande[0]['code_postal'] ?>
-                <?php echo $details_commande[0]['ville'] ?>
-                <hr>
-                <!-- détail des articles -->
-                <table class="table table-bordered table-striped">
-                    <tr>
-                        <th>Référence</th>
-                        <th>Article</th>
-                        <th>Quantité</th>
-                        <th>Prix Unitaire</th>
-                    </tr>
-                    <?php
-                    $montant_total = 0;
-                    $quantite_total = 0;
-                    foreach ($details_commande as $lignecmd) {
-                    ?>
-                        <tr>
-                            <td><?php echo $lignecmd['reference'] ?></td>
-                            <td><?php echo $lignecmd['titre'] ?><br>Taille : <?php echo $lignecmd['taille'] ?></td>
-                            <td><?php echo $lignecmd['quantite'] ?></td>
-                            <td><?php echo number_format($lignecmd['prixU'], 2, ',', '&nbsp;') ?>&euro;</td>
-                        </tr>
-                    <?php
-                        $montant_total += $lignecmd['quantite'] * $lignecmd['prixU'];
-                        $quantite_total += $lignecmd['quantite'];
-                    }
-                    if (count($details_commande) > 1) :
-                    ?>
-                        <tr>
-                            <td>Total</td>
-                            <td></td>
-                            <td><?php echo $quantite_total ?></td>
-                            <td><?php echo number_format($montant_total, 2, ',', '&nbsp;') . '&euro;' ?></td>
-                        </tr>
-                    <?php endif; ?>
-                </table>
-            </div>
-        <?php endif; ?>
-    </div>
-</div>
-
 <?php
+
+// affichage des commande
+$commandes = execRequete('SELECT * FROM commande');
+if ($commandes->rowCount() == 0) : ?>
+    <div class="alert alert-info mt-5">Il n'y a pas encore de commandes enregistrés</div>
+<?php else : ?>
+    <p>Il y a <?php echo $commandes->rowCount() ?> commande<?php echo ($commandes->rowCount() > 1) ? 's' : '' ?></p>
+    <table class="table table-bordered table-striped table-responsive-lg">
+        <tr>
+            <!-- entêtes de colonne -->
+            <?php for ($i = 0; $i < $commandes->columnCount(); $i++) :
+                $colonne = $commandes->getColumnMeta($i);
+            ?>
+                <th><?php echo ucfirst($colonne['name']); ?></th>
+            <?php endfor; ?>
+            <th>Prix</th>
+            <th>Action</th>
+        </tr>
+        <!-- données de colonne -->
+        <?php while ($commande = $commandes->fetch()) : ?>
+            <tr>
+                <?php foreach ($commande as $key => $value) :
+                    switch ($key) {
+                        case 'id_membre':
+                            $email = execRequete("SELECT email FROM membre WHERE id_membre=$value")->fetch()['email'];
+                            $value .= ' - ' . $email;
+                            break;
+                        case 'id_produit':
+                            $titre = execRequete("SELECT titre FROM produit p INNER JOIN salle s ON s.id_salle = p.id_salle WHERE p.id_produit=$value")->fetch()['titre'];
+                            $date_arrivee = execRequete("SELECT date_arrivee FROM produit WHERE id_produit=$value")->fetch()['date_arrivee'];
+                            $date_depart = execRequete("SELECT date_depart FROM produit WHERE id_produit=$value")->fetch()['date_depart'];
+                            $value .= ' - ' . $titre . ' ' . date('d/m/Y', strtotime($date_arrivee)) . ' au ' . date('d/m/Y', strtotime($date_depart));
+                            break;
+                        case 'date_enregistrement':
+                            $value = date('d/m/Y à H:i', strtotime($value));
+                            break;
+                        case 'prix':
+                            $value = number_format($value, 2, ',', '&nbsp;') . '&euro;';
+                            break;
+                    }
+                ?>
+                    <td><?php echo $value ?></td>
+                <?php endforeach; ?>
+                <td><?php
+                    $prix = execRequete("SELECT prix FROM produit p INNER JOIN commande c ON c.id_produit = p.id_produit WHERE p.id_produit=$commande[id_produit]")->fetch()['prix'];
+                    echo number_format($prix, 2, ',', '&nbsp;') . '&euro;';
+                    ?></td>
+                <td><a href="?action=delete&id_commande=<?php echo $commande['id_commande'] ?>" class="confirm"><i class="fas fa-trash-alt"></i></a></td>
+            </tr>
+        <?php endwhile; ?>
+    </table>
+<?php endif;
+
 require_once('../inc/footer.php');
