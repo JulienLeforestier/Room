@@ -53,10 +53,10 @@ require_once('../inc/header.php');
 // affichage des avis
 $resultats = execRequete('SELECT * FROM avis');
 if ($resultats->rowCount() == 0) : ?>
-    <div class="alert alert-info mt-5">Il n'y a pas encore d'avis enregistrés</div>
+    <div class="alert alert-info mt-3">Il n'y a pas encore d'avis enregistrés</div>
 <?php else : ?>
-    <p>Il y a <?php echo $resultats->rowCount() ?> avis</p>
-    <table class="table table-bordered table-striped table-responsive-lg">
+    <p class="mt-3">Il y a <?php echo $resultats->rowCount() ?> avis</p>
+    <table class="table table-bordered table-striped table-responsive-lg mb-5">
         <tr>
             <!-- entêtes de colonne -->
             <?php for ($i = 0; $i < $resultats->columnCount(); $i++) :
@@ -77,14 +77,14 @@ if ($resultats->rowCount() == 0) : ?>
                             break;
                         case 'id_membre':
                             $email = execRequete("SELECT email FROM membre WHERE id_membre=$value")->fetch()['email'];
-                            $value .= ' - ' . $email;
+                            $value .= '&nbsp;-&nbsp;' . $email;
                             break;
                         case 'id_salle':
                             $titre = execRequete("SELECT titre FROM salle WHERE id_salle=$value")->fetch()['titre'];
-                            $value .= ' - ' . $titre;
+                            $value .= '&nbsp;-&nbsp;' . $titre;
                             break;
                         case 'date_enregistrement':
-                            $value = date('d/m/Y à H:i:s', strtotime($value));
+                            $value = date('d/m/Y à H:i', strtotime($value));
                             break;
                     }
                 ?>
@@ -111,7 +111,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'edit') :
         </div>
     <?php endif; ?>
 
-    <form method="post" class="py-2">
+    <form method="post" class="mb-5">
         <?php if (!empty($avis_courant['id_avis'])) : ?>
             <input type="hidden" name="id_avis" value="<?php echo $avis_courant['id_avis'] ?>">
         <?php endif; ?>
@@ -147,5 +147,4 @@ if (isset($_GET['action']) && $_GET['action'] == 'edit') :
         <button type="submit" class="btn btn-primary">Enregistrer</button>
     </form>
 <?php endif;
-
 require_once('../inc/footer.php');

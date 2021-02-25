@@ -25,7 +25,7 @@ if (!empty($_POST)) {
     if (empty($errors)) {
         $_POST['id_membre'] = $_SESSION['membre']['id_membre'];
         execRequete("INSERT INTO avis VALUES (NULL,:id_membre,:id_salle,:commentaire,:note,NOW())", $_POST);
-        header('location:' . URL . 'compte.php');
+        header('location:' . URL);
         exit();
     }
 }
@@ -53,7 +53,7 @@ require_once('inc/header.php');
             <label for="id_salle">Salle</label>
             <select class="form-control" id="id_salle" name="id_salle">
                 <?php while ($salle = $salles->fetch()) : ?>
-                    <option value="<?php echo $salle['id_salle'] ?>">
+                    <option value="<?php echo $salle['id_salle'] ?>" <?php echo ((isset($_GET['id_salle']) && $_GET['id_salle'] == $salle['id_salle'])) ? 'selected' : '' ?>>
                         <?php echo $salle['titre'] ?>
                     </option>
                 <?php endwhile; ?>
@@ -66,7 +66,7 @@ require_once('inc/header.php');
                 $notes = array('1' => '★', '2' => '★★', '3' => '★★★', '4' => '★★★★', '5' => '★★★★★');
                 foreach ($notes as $key => $note) :
                 ?>
-                    <option value="<?php echo $key ?>">
+                    <option value="<?php echo $key ?>" <?php echo ($key == 5) ? 'selected' : '' ?>>
                         <?php echo $note ?>
                     </option>
                 <?php endforeach; ?>
@@ -75,7 +75,7 @@ require_once('inc/header.php');
     </div>
     <div class="form-group">
         <label for="commentaire">Commentaire</label>
-        <textarea class="form-control" id="commentaire" name="commentaire" rows="4"></textarea>
+        <textarea class="form-control" id="commentaire" name="commentaire" rows="4" placeholder="Laissez nous votre avis" required></textarea>
     </div>
     <button type="submit" class="btn btn-primary">Enregistrer</button>
 </form>

@@ -10,7 +10,7 @@ if (!isAdmin()) {
 }
 
 // salles les mieux notées
-$salles_mieux_notees = execRequete("SELECT titre,AVG(note) AS note_moyenne FROM salle s 
+$salles_mieux_notees = execRequete("SELECT titre,ROUND(AVG(note),1) AS note_moyenne FROM salle s 
                                     INNER JOIN avis a ON a.id_salle = s.id_salle
                                     GROUP BY titre
                                     ORDER BY note_moyenne DESC
@@ -44,7 +44,7 @@ require_once('../inc/header.php');
 // corps de la page
 ?>
 
-<h1 class="mt-2">Statistiques</h1>
+<h1 class="mt-2">Statistiques (Top 5)</h1>
 <hr>
 
 <div id="tabs">
@@ -137,5 +137,4 @@ require_once('../inc/header.php');
 </div>
 
 <?php
-
 require_once('../inc/footer.php');

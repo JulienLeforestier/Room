@@ -84,10 +84,10 @@ if (!isset($_GET['action']) || (isset($_GET['action']) && $_GET['action'] == 'af
     // affichage des produits
     $produits = execRequete('SELECT * FROM produit');
     if ($produits->rowCount() == 0) : ?>
-        <div class="alert alert-info mt-5">Il n'y a pas encore de produits enregistrés</div>
+        <div class="alert alert-info mt-3">Il n'y a pas encore de produits enregistrés</div>
     <?php else : ?>
-        <p class="py-2">Il y a <?php echo $produits->rowCount() ?> produit<?php echo ($produits->rowCount() > 1) ? 's' : '' ?></p>
-        <table class="table table-bordered table-striped table-responsive-lg">
+        <p class="mt-3">Il y a <?php echo $produits->rowCount() ?> produit<?php echo ($produits->rowCount() > 1) ? 's' : '' ?></p>
+        <table class="table table-bordered table-striped table-responsive-lg mb-5">
             <tr>
                 <!-- entêtes de colonne -->
                 <?php for ($i = 0; $i < $produits->columnCount(); $i++) :
@@ -138,7 +138,7 @@ if (isset($_GET['action']) && ($_GET['action'] == 'ajout' || $_GET['action'] == 
             <?php echo implode('<br>', $errors) ?>
         </div>
     <?php endif; ?>
-    <form method="post" class="py-2">
+    <form method="post" class="mb-5">
         <?php if (!empty($produit_courant['id_produit'])) : ?>
             <input type="hidden" name="id_produit" value="<?php echo $produit_courant['id_produit'] ?>">
         <?php endif; ?>
@@ -162,15 +162,14 @@ if (isset($_GET['action']) && ($_GET['action'] == 'ajout' || $_GET['action'] == 
         <div class="form-row">
             <div class="form-group col-md-6">
                 <label for="date_arrivee">Date d'arrivée</label>
-                <input type="text" class="form-control" id="date_arrivee" name="date_arrivee" value="<?php echo $_POST['date_arrivee'] ?? $produit_courant['date_arrivee'] ?? '' ?>">
+                <input type="text" class="form-control" id="date_arrivee" name="date_arrivee" placeholder="00/00/0000 00:00" value="<?php echo $_POST['date_arrivee'] ?? $produit_courant['date_arrivee'] ?? '' ?>">
             </div>
             <div class="form-group col-md-6">
                 <label for="date_depart">Date de départ</label>
-                <input type="text" class="form-control" id="date_depart" name="date_depart" value="<?php echo $_POST['date_depart'] ?? $produit_courant['date_depart'] ?? '' ?>">
+                <input type="text" class="form-control" id="date_depart" name="date_depart" placeholder="00/00/0000 00:00" value="<?php echo $_POST['date_depart'] ?? $produit_courant['date_depart'] ?? '' ?>">
             </div>
         </div>
         <button type="submit" class="btn btn-primary">Enregistrer</button>
     </form>
 <?php endif;
-
 require_once('../inc/footer.php');

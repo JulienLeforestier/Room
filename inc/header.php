@@ -25,6 +25,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-timepicker-addon.min.js" integrity="sha512-s5u/JBtkPg+Ff2WEr49/cJsod95UgLHbC00N/GglqdQuLnYhALncz8ZHiW/LxDRGduijLKzeYb7Aal9h3codZA==" crossorigin="anonymous"></script>
     <!-- script perso -->
     <script src="<?php echo URL ?>inc/js/functions.js"></script>
+    <!-- script datetimepicker -->
+    <script src="<?php echo URL ?>inc/js/datetimepicker.js"></script>
+    <!-- script ajax -->
+    <script src="<?php echo URL ?>inc/js/ajax.js"></script>
 </head>
 
 <body>

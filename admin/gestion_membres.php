@@ -50,10 +50,10 @@ if (!isset($_GET['action']) || (isset($_GET['action']) && $_GET['action'] == 'af
     // affichage des membres
     $membres = execRequete('SELECT * FROM membre');
     if ($membres->rowCount() == 0) : ?>
-        <div class="alert alert-info mt-5">Il n'y a pas encore de membres enregistrés</div>
+        <div class="alert alert-info mt-3">Il n'y a pas encore de membres enregistrés</div>
     <?php else : ?>
-        <p>Il y a <?php echo $membres->rowCount() ?> membre<?php echo ($membres->rowCount() > 1) ? 's' : '' ?></p>
-        <table class="table table-bordered table-striped table-responsive-lg">
+        <p class="mt-3">Il y a <?php echo $membres->rowCount() ?> membre<?php echo ($membres->rowCount() > 1) ? 's' : '' ?></p>
+        <table class="table table-bordered table-striped table-responsive-lg mb-5">
             <tr>
                 <!-- entêtes de colonne -->
                 <?php for ($i = 0; $i < $membres->columnCount(); $i++) :
@@ -107,7 +107,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'edit') :
             <?php echo implode('<br>', $errors) ?>
         </div>
     <?php endif; ?>
-    <form method="post" class="py-2">
+    <form method="post" class="mb-5">
         <?php if (!empty($membre_courant['id_membre'])) : ?>
             <input type="hidden" name="id_membre" value="<?php echo $membre_courant['id_membre'] ?>">
         <?php endif; ?>
@@ -163,5 +163,4 @@ if (isset($_GET['action']) && $_GET['action'] == 'edit') :
         <button type="submit" class="btn btn-primary">Enregistrer</button>
     </form>
 <?php endif;
-
 require_once('../inc/footer.php');

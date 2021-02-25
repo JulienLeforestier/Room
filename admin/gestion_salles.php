@@ -100,10 +100,10 @@ if (!isset($_GET['action']) || (isset($_GET['action']) && $_GET['action'] == 'af
     // affichage des salles
     $resultats = execRequete('SELECT * FROM salle');
     if ($resultats->rowCount() == 0) : ?>
-        <div class="alert alert-info mt-5">Il n'y a pas encore de salles enregistrées</div>
+        <div class="alert alert-info mt-3">Il n'y a pas encore de salles enregistrées</div>
     <?php else : ?>
-        <p class="py-2">Il y a <?php echo $resultats->rowCount() ?> salle<?php echo ($resultats->rowCount() > 1) ? 's' : '' ?></p>
-        <table class="table table-bordered table-striped table-responsive-lg">
+        <p class="mt-3">Il y a <?php echo $resultats->rowCount() ?> salle<?php echo ($resultats->rowCount() > 1) ? 's' : '' ?></p>
+        <table class="table table-bordered table-striped table-responsive-lg mb-5">
             <tr>
                 <!-- entêtes de colonne -->
                 <?php for ($i = 0; $i < $resultats->columnCount(); $i++) :
@@ -157,7 +157,7 @@ if (isset($_GET['action']) && ($_GET['action'] == 'ajout' || $_GET['action'] == 
             <?php echo implode('<br>', $errors) ?>
         </div>
     <?php endif; ?>
-    <form method="post" enctype="multipart/form-data" class="py-2">
+    <form method="post" enctype="multipart/form-data" class="mb-5">
         <?php if (!empty($salle_courante['id_salle'])) : ?>
             <input type="hidden" name="id_salle" value="<?php echo $salle_courante['id_salle'] ?>">
         <?php endif; ?>
@@ -228,5 +228,4 @@ if (isset($_GET['action']) && ($_GET['action'] == 'ajout' || $_GET['action'] == 
         <button type="submit" class="btn btn-primary">Enregistrer</button>
     </form>
 <?php endif;
-
 require_once('../inc/footer.php');
