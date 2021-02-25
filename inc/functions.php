@@ -34,3 +34,11 @@ function getMembreByPseudo($pseudo)
     if ($resultat->rowCount() > 0) return $resultat;
     else return false;
 }
+
+// contrôler l'existance d'un email, le cas échéant retourner toutes les infos de ce membre
+function getMembreByEmail($email)
+{
+    $resultat = execRequete("SELECT * FROM membre WHERE email=:email", array('email' => $email));
+    if ($resultat->rowCount() > 0) return $resultat;
+    else return false;
+}

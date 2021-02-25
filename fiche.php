@@ -79,7 +79,7 @@ require_once('inc/header.php');
             <p><?php echo $infos['description'] ?></p>
             <h2>Localisation</h2>
             <!-- googleMap -->
-            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2594.3017243284035!2d1.090869815695069!3d49.44101407934881!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e0de787215ce13%3A0xdc8e1e48862e7d52!2s20%20Rue%20du%20Gros%20Horloge%2C%2076000%20Rouen!5e0!3m2!1sfr!2sfr!4v1614247090203!5m2!1sfr!2sfr" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            <iframe width="100%" height="450" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?width=100%25&amp;height=600&amp;hl=fr&amp;q=<?php echo $infos['adresse']. ',' . $infos['cp'] . ',' . $infos['ville'] . ',' . $infos['pays'] ?>&amp;t=&amp;z=14&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"></iframe>
         </div>
     </div>
     <br>

@@ -1,13 +1,13 @@
 document.addEventListener('DOMContentLoaded', function () {
 
-    if (document.getElementById('photo')) {
+    if ($('#photo')) {
         $('#photo').on('change', function (e) {
             let fichier = e.target.files;
             let reader = new FileReader();
             reader.readAsDataURL(fichier[0]);
             reader.onload = function (event) {
-                document.getElementById('placeholder').setAttribute('src', event.target.result);
-                document.getElementById('placeholder').setAttribute('alt', fichier[0].name);
+                $('#placeholder').setAttribute('src', event.target.result);
+                $('#placeholder').setAttribute('alt', fichier[0].name);
             }
         });
     }
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function () {
         $('#placeholder').on('drop', updatePhoto);
     }
 
-    if (document.getElementById('tabs')) {
+    if ($('#tabs')) {
         $(function () {
             $('#tabs').tabs({
                 collapsible: true,
@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    if (document.getElementById('prix')) {
+    if ($('#prix')) {
         $('.range').next().text('10000€');
         $('.range').on('input', function () {
             var $set = $(this).val();

@@ -22,6 +22,8 @@ if (!empty($_POST)) {
     if (!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) $errors[] = "Format de mail invalide";
     // contrôle de l'unicité du pseudo
     if (getMembreByPseudo($_POST['pseudo'])) $errors[] = "Pseudo indisponible, merci d'en choisir un autre";
+    // contrôle de l'unicité de l'email
+    if (getMembreByEmail($_POST['email'])) $errors[] = "Email indisponible, vous avez peut être déjà un compte chez nous?";
     // contrôle du nombre d'erreur, si aucune, je peux procéder à l'inscription
     if (empty($errors)) {
         $_POST['mdp'] = password_hash($_POST['mdp'], PASSWORD_DEFAULT);
