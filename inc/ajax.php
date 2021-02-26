@@ -9,6 +9,8 @@ if (!empty($_GET)) {
     foreach ($_GET as $key => $value) {
         if ($key == 'capacite') $whereclause .= ' AND ' . $key . '>=:' . $key;
         else if ($key == 'prix') $whereclause .= ' AND ' . $key . '<=:' . $key;
+        else if ($key == 'date_arrivee') $whereclause .= ' AND ' . $key . '>=:' . $key;
+        else if ($key == 'date_depart') $whereclause .= ' AND ' . $key . '<=:' . $key;
         else $whereclause .= ' AND ' . $key . '=:' . $key;
         $args[$key] = $value;
     }
@@ -22,7 +24,7 @@ $produits = execRequete("   SELECT * FROM salle s
 
 //corps de la page
 if ($produits->rowCount() == 0) : ?>
-    <div class="alert alert-info mt-5">Plus de produits pour le moment. Revenez bientôt!</div>
+    <div class="alert alert-info mt-5">Aucun produit ne correspond à vos critères de recherche pour le moment. <a href="">Réinitialiser les filtres</a></div>
 <?php else : ?>
     <div class="row col-lg-12 justify-content-center">
         <?php while ($produit = $produits->fetch()) : ?>
@@ -56,8 +58,8 @@ if ($produits->rowCount() == 0) : ?>
                             <?php if ($produit['note']) : ?>
                                 <!-- calcul de la note moyenne de la salle actuelle -->
                                 <?php $note = execRequete(" SELECT ROUND(AVG(note)) AS note_moyenne FROM salle s 
-                                                                                        INNER JOIN avis a ON a.id_salle = s.id_salle
-                                                                                        WHERE s.id_salle = :id_salle", array('id_salle' => $produit['id_salle']))->fetch()['note_moyenne']; ?>
+                                                            INNER JOIN avis a ON a.id_salle = s.id_salle
+                                                            WHERE s.id_salle = :id_salle", array('id_salle' => $produit['id_salle']))->fetch()['note_moyenne']; ?>
                                 <?php switch ($note) {
                                     case '1':
                                         echo '★';

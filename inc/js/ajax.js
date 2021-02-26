@@ -6,10 +6,10 @@ document.addEventListener('DOMContentLoaded', function () {
         let selects = document.querySelectorAll('select');
         let capacite = document.getElementById('capacite');
         let prix = document.getElementById('prix');
-        let dates = document.querySelectorAll('.date');
+        let date_arrivee = document.getElementById('date_arrivee');
+        let date_depart = document.getElementById('date_depart');
 
         for (let i = 0; i < links.length; i++) {
-            links[i].style.cursor = 'pointer';
             links[i].addEventListener('click', function (e) {
                 e.preventDefault();
                 link = links[i]['href'].split('?');
@@ -18,23 +18,36 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         for (let i = 0; i < selects.length; i++) {
-            selects[i].style.cursor = 'pointer';
             selects[i].addEventListener('change', function (e) {
                 e.preventDefault();
                 callAjax('ville=' + selects[i].value);
             });
         }
 
-        capacite.style.cursor = 'pointer';
         capacite.addEventListener('change', function (e) {
             e.preventDefault();
             callAjax('capacite=' + capacite.value);
         });
 
-        prix.style.cursor = 'pointer';
-        prix.addEventListener('change', function (e) {
+        prix.addEventListener('input', function (e) {
             e.preventDefault();
             callAjax('prix=' + prix.value);
+        });
+
+        date_arrivee.addEventListener('blur', function (e) {
+            e.preventDefault();
+            function wait() {
+                callAjax('date_arrivee=' + dayjs(date_arrivee.value, 'MM/DD/YYYY HH:mm').format('YYYY/MM/DD HH:mm:ss'));
+            }
+            setTimeout(wait, 250);
+        });
+
+        date_depart.addEventListener('blur', function (e) {
+            e.preventDefault();
+            function wait() {
+                callAjax('date_depart=' + dayjs(date_depart.value, 'MM/DD/YYYY HH:mm').format('YYYY/MM/DD HH:mm:ss'));
+            }
+            setTimeout(wait, 250);
         });
     }
 
@@ -42,13 +55,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function callAjax(param) {
 
-        for (let i = 0; i < params.length; i++) {
+        for (let i = params.length - 1; i >= 0; i--) {
 
             if (params == 'inc/ajax.php') {
                 params.push('?' + param);
                 break;
             } else if (params[i].includes(param.split('=')[0])) {
-                params.splice(i, 1, '?' + param);
+                if (params[i].includes('?')) params.splice(i, 1, '?' + param);
+                else if (params[i].includes('&')) params.splice(i, 1, '&' + param);
                 break;
             } else if (params[i].includes('?')) {
                 params.push('&' + param);
@@ -58,7 +72,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         let url = '';
         for (let i = 0; i < params.length; i++) url += params[i];
-
         ajax(url);
     }
 

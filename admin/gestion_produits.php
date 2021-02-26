@@ -24,6 +24,10 @@ $produits = execRequete('SELECT * FROM produit');
 
 // traitement du formulaire
 if (!empty($_POST)) {
+    // remise en place du datetime pour entrer en BDD
+    $_POST['date_arrivee'] = date('Y/m/d H:i:s', strtotime($_POST['date_arrivee']));
+    $_POST['date_depart'] = date('Y/m/d H:i:s', strtotime($_POST['date_depart']));
+
     // contrôles
     $nb_champs_vides = 0;
     foreach ($_POST as $key => $value) {
@@ -33,35 +37,31 @@ if (!empty($_POST)) {
 
     if ($nb_champs_vides > 0) $errors[] = "Il manque $nb_champs_vides information(s)";
 
+    // contrôle de l'etat
+    if (isset($_POST['etat']) && $_POST['etat'] == 'reservation') $errors[] = "Salle déjà réservée";
+
+    // contrôle des dates d'entrée et de sortie
+    $produit_salles = execRequete(" SELECT * FROM produit 
+                                    WHERE id_salle=:id_salle
+                                    AND (date_arrivee>=:date_depart
+                                    OR date_depart<=:date_arrivee)", array('id_salle' => $_POST['id_salle'], 'date_arrivee' => $_POST['date_arrivee'], 'date_depart' => $_POST['date_depart']));
+
+    if ($produit_salles->rowCount() == 0) $errors[] = "Date déjà réservée";
+
     if (empty($errors)) {
-        $_POST['etat'] = 'libre';
-        $_POST['date_arrivee'] = date('Y/m/d H:i:s', strtotime($_POST['date_arrivee']));
-        $_POST['date_depart'] = date('Y/m/d H:i:s', strtotime($_POST['date_depart']));
-        while ($produit = $produits->fetch()) {
-            // if (
-            //     $produit['id_salle'] == $_POST['id_salle']
-            //     && strtotime($produit['date_depart']) < strtotime($_POST['date_arrivee'])
-            //     && strtotime($produit['date_arrivee']) > strtotime($_POST['date_depart'])
-            // ) {
-            if (isset($_POST['id_produit'])) {
-                // update en BDD
-                execRequete("UPDATE produit SET 
+        if (isset($_POST['id_produit'])) {
+            // update en BDD
+            execRequete("UPDATE produit SET 
                         id_salle=:id_salle,date_arrivee=:date_arrivee,date_depart=:date_depart,prix=:prix,etat=:etat
                         WHERE id_produit=:id_produit", $_POST);
-            } else {
-                // insert en BDD
-                execRequete("INSERT INTO produit VALUES 
+        } else {
+            // insert en BDD
+            execRequete("INSERT INTO produit VALUES 
                         (NULL,:id_salle,:date_arrivee,:date_depart,:prix,:etat)", $_POST);
-            }
-            // on force le mode affichage des produits
-            header('location:' . $_SERVER['PHP_SELF']);
-            exit();
-            // } else {
-            //     echo 'NON';
-            //     // header('location:' . $_SERVER['PHP_SELF']);
-            //     // exit();
-            // }
         }
+        // on force le mode affichage des produits
+        header('location:' . $_SERVER['PHP_SELF']);
+        exit();
     }
 }
 
@@ -160,14 +160,36 @@ if (isset($_GET['action']) && ($_GET['action'] == 'ajout' || $_GET['action'] == 
             </div>
         </div>
         <div class="form-row">
-            <div class="form-group col-md-6">
+            <div class="form-group col-md-5">
                 <label for="date_arrivee">Date d'arrivée</label>
                 <input type="text" class="form-control" id="date_arrivee" name="date_arrivee" placeholder="00/00/0000 00:00" value="<?php echo $_POST['date_arrivee'] ?? $produit_courant['date_arrivee'] ?? '' ?>">
             </div>
-            <div class="form-group col-md-6">
+            <div class="form-group col-md-5">
                 <label for="date_depart">Date de départ</label>
                 <input type="text" class="form-control" id="date_depart" name="date_depart" placeholder="00/00/0000 00:00" value="<?php echo $_POST['date_depart'] ?? $produit_courant['date_depart'] ?? '' ?>">
             </div>
+            <?php if ($_GET['action'] == 'edit') : ?>
+                <div class="form-group col-md-2">
+                    <label for="etat">État</label>
+                    <select name="etat" id="etat" class="form-control">
+                        <?php
+                        $etats = array('libre' => 'Libre', 'reservation' => 'Réservation');
+                        foreach ($etats as $key => $etat) :
+                        ?>
+                            <option value="<?php echo $key ?>" <?php echo ((isset($_POST['etat']) && $_POST['etat'] == $key) || (isset($produit_courant['etat']) && $produit_courant['etat'] == $key)) ? 'selected' : '' ?>>
+                                <?php echo $etat ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            <?php else : ?>
+                <div class="form-group col-md-2">
+                    <label for="etat">État</label>
+                    <select name="etat" id="etat" class="form-control">
+                        <option value="libre">Libre</option>
+                    </select>
+                </div>
+            <?php endif; ?>
         </div>
         <button type="submit" class="btn btn-primary">Enregistrer</button>
     </form>

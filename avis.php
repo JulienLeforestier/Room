@@ -30,6 +30,8 @@ if (!empty($_POST)) {
     }
 }
 
+if (!isset($_GET['id_salle'])) header('location:' . URL);
+
 // salles
 $salles = execRequete("SELECT * FROM salle");
 
@@ -51,7 +53,7 @@ require_once('inc/header.php');
     <div class="row">
         <div class="form-group col-sm-4">
             <label for="id_salle">Salle</label>
-            <select class="form-control" id="id_salle" name="id_salle">
+            <select class="form-control" id="id_salle" name="id_salle" disabled>
                 <?php while ($salle = $salles->fetch()) : ?>
                     <option value="<?php echo $salle['id_salle'] ?>" <?php echo ((isset($_GET['id_salle']) && $_GET['id_salle'] == $salle['id_salle'])) ? 'selected' : '' ?>>
                         <?php echo $salle['titre'] ?>
@@ -81,4 +83,48 @@ require_once('inc/header.php');
 </form>
 
 <?php
+
+// affichage des avis
+$resultats = execRequete('SELECT * FROM avis WHERE id_salle =' . $_GET['id_salle']);
+if ($resultats->rowCount() == 0) : ?>
+    <div class="alert alert-info mt-3">Il n'y a pas encore d'avis enregistrés</div>
+<?php else : ?>
+    <p class="mt-3">Il y a <?php echo $resultats->rowCount() ?> avis</p>
+    <table class="table table-bordered table-striped table-responsive-lg mb-5">
+        <tr>
+            <!-- entêtes de colonne -->
+            <?php for ($i = 0; $i < $resultats->columnCount(); $i++) :
+                $colonne = $resultats->getColumnMeta($i);
+            ?>
+                <th><?php echo ucfirst($colonne['name']); ?></th>
+            <?php endfor; ?>
+        </tr>
+        <!-- données de colonne -->
+        <?php while ($ligne = $resultats->fetch()) : ?>
+            <tr>
+                <?php foreach ($ligne as $key => $value) :
+                    switch ($key) {
+                        case 'note':
+                            $notes = array('1' => '★', '2' => '★★', '3' => '★★★', '4' => '★★★★', '5' => '★★★★★');
+                            $value = $notes[$value];
+                            break;
+                        case 'id_membre':
+                            $pseudo = execRequete("SELECT pseudo FROM membre WHERE id_membre=$value")->fetch()['pseudo'];
+                            $value .= '&nbsp;-&nbsp;' . $pseudo;
+                            break;
+                        case 'id_salle':
+                            $titre = execRequete("SELECT titre FROM salle WHERE id_salle=$value")->fetch()['titre'];
+                            $value .= '&nbsp;-&nbsp;' . $titre;
+                            break;
+                        case 'date_enregistrement':
+                            $value = date('d/m/Y à H:i', strtotime($value));
+                            break;
+                    }
+                ?>
+                    <td><?php echo $value ?></td>
+                <?php endforeach; ?>
+            </tr>
+        <?php endwhile; ?>
+    </table>
+<?php endif;
 require_once('inc/footer.php');

@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (document.getElementById('date_arrivee')) {
         var startDateTextBox = $('#date_arrivee');
         var endDateTextBox = $('#date_depart');
-        // $('#date_depart').prop('disabled', true);
 
         startDateTextBox.datetimepicker({
             minDate: 0,
@@ -33,7 +32,6 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             onSelect: function (selectedDateTime) {
                 endDateTextBox.datetimepicker('option', 'minDate', startDateTextBox.datetimepicker('getDate'));
-                // $('#date_depart').prop('disabled', false);
             }
         });
         endDateTextBox.datetimepicker({
