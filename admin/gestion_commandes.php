@@ -29,7 +29,7 @@ require_once('../inc/header.php');
 // affichage des commande
 $commandes = execRequete('SELECT * FROM commande');
 if ($commandes->rowCount() == 0) : ?>
-    <div class="alert alert-info mt-3">Il n'y a pas encore de commandes enregistrés</div>
+    <div class="alert alert-info mt-3">Il n'y a pas encore de commandes enregistrées</div>
 <?php else : ?>
     <p class="mt-3">Il y a <?php echo $commandes->rowCount() ?> commande<?php echo ($commandes->rowCount() > 1) ? 's' : '' ?></p>
     <table class="table table-bordered table-striped table-responsive-lg mb-5">
