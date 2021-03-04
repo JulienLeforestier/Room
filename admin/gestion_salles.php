@@ -54,7 +54,7 @@ if (!empty($_POST)) {
                 unlink($_SERVER['DOCUMENT_ROOT'] . URL . 'photos/' . $_POST['photo_actuelle']);
             }
             // gérer la photo (copie physique du fichier)
-            $nomPhotoBDD = $_POST['titre'] . '_' . $_FILES['photo']['name'];
+            $nomPhotoBDD = str_replace(' ', '_', $_POST['titre'] . '_' . $_FILES['photo']['name']);
             $dossierPhotos = $_SERVER['DOCUMENT_ROOT'] . URL . 'photos/';
             // déplacement du fichier temporaire vers le dossier 'photos' sous un nom unique (composé du titre et du nom original du fichier)
             move_uploaded_file($_FILES['photo']['tmp_name'], $dossierPhotos . $nomPhotoBDD);

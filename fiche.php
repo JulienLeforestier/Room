@@ -79,7 +79,7 @@ require_once('inc/header.php');
             <p><?php echo $infos['description'] ?></p>
             <h2>Localisation</h2>
             <!-- googleMap -->
-            <iframe width="100%" height="450" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?width=100%25&amp;height=600&amp;hl=fr&amp;q=<?php echo $infos['adresse'] . ',' . $infos['cp'] . ',' . $infos['ville'] . ',' . $infos['pays'] ?>&amp;t=&amp;z=14&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"></iframe>
+            <iframe width="100%" height="450" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?width=100%25&amp;height=600&amp;hl=fr&amp;q=<?php echo str_replace(' ', '%20', $infos['adresse']) . ',' . $infos['cp'] . ',' . $infos['ville'] . ',' . $infos['pays'] ?>&amp;t=&amp;z=14&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"></iframe>
         </div>
     </div>
     <br>
