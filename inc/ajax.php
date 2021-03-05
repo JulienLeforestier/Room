@@ -2,7 +2,7 @@
 
 require_once('init.php');
 
-$whereclause = "WHERE etat != 'reservation'";
+$whereclause = "WHERE etat != 'reservation' AND date_arrivee >= NOW()";
 $args = array();
 
 if (!empty($_GET)) {

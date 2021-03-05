@@ -17,11 +17,11 @@ require_once('inc/header.php');
     <form method="post">
         <div class="form-group">
             <label for="emailContact" class="form-label">Email</label>
-            <input type="email" class="form-control" id="emailContact" pattern="^[^\W][a-zA-Z0-9]+(.[a-zA-Z0-9]+)@[a-zA-Z0-9]+(.[a-zA-Z0-9]+).[a-zA-Z]{2,4}$" required>
+            <input type="email" class="form-control" id="emailContact" name="emailContact" pattern="^[^\W][a-zA-Z0-9]+(.[a-zA-Z0-9]+)@[a-zA-Z0-9]+(.[a-zA-Z0-9]+).[a-zA-Z]{2,4}$" required>
         </div>
         <div class="form-group">
             <label for="messageContact" class="form-label">Message</label>
-            <textarea class="form-control" id="messageContact" placeholder="Laissez nous votre message" rows="5" required></textarea>
+            <textarea class="form-control" id="messageContact" name="messageContact" placeholder="Laissez nous votre message" rows="5" required></textarea>
         </div>
         <button type="submit" class="btn btn-primary">Envoyer</button>
     </form>
