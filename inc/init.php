@@ -31,7 +31,7 @@ try {
             )
         );
         // constante de site
-        define('URL', 'http://psl7535.webmo.fr/Room/');
+        define('URL', 'https://www.jleforestier.fr/Room/');
     }
 } catch (PDOException $e) {
     echo $e->getMessage() . '<br>Fichier : ' . $e->getFile() . '<br>Ligne : ' . $e->getLine() . '<br>';

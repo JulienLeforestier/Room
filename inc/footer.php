@@ -1,6 +1,6 @@
 <?php
 if (preg_match('#^localhost$#', $_SERVER['HTTP_HOST'])) $url = '/workspacevsc/room/';
-else $url = 'http://psl7535.webmo.fr/Room/';
+else $url = 'https://www.jleforestier.fr/Room/';
 ?>
 
 </main>
